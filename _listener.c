@@ -14,8 +14,8 @@
 int main () {
 
     int sockfd;
-    struct sockaddr_in my_addr;
-    struct sockaddr_in their_addr;
+    struct sockaddr_in my_addr; // my address info
+    struct sockaddr_in their_addr; // connector's info
     socklen_t addr_len;
 
     int numbytes;
@@ -23,15 +23,18 @@ int main () {
     char print_buf[256];
     printf ("Started listener!!\n");
 
+    // create a socket
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
         printf ("Unable to create a socket");
+        exit(1);
     }
 
-    my_addr.sin_family = AF_INET;
+    my_addr.sin_family = AF_INET; // host byte order
     my_addr.sin_port = htons(BROADCAST_PORT);
-    my_addr.sin_addr.s_addr = INADDR_ANY;
+    my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fillup with my IP
     memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
 
+    // bind the socket to the port
     if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr) == -1) {
         printf ("Error in binding the socket with file descriptor");
         exit(1);
@@ -39,10 +42,11 @@ int main () {
 
     addr_len = sizeof their_addr;
 
+    // keep listening
     while (1) {
         if ((numbytes = recvfrom(sockfd, &buf, RCV_BUF_LEN-1, 0, (struct sockaddr *)&their_addr,
                                                                             &addr_len)) == -1) {
-            printf ("recvall");
+            printf ("Error in receiving the beacon message");
             exit(1);
         }
 
