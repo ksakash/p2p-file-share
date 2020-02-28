@@ -12,7 +12,7 @@
 
 int main()
 {
-  printf ("clinet init");
+  printf ("client init\n");
   int sock;
   int yes = 1;
   struct sockaddr_in broadcast_addr;
@@ -42,14 +42,13 @@ int main()
   memset((void *)&broadcast_addr, 0, addr_len);
   broadcast_addr.sin_family = AF_INET;
   broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-  broadcast_addr.sin_addr.s_addr = inet_addr ("172.23.64.243");
+  broadcast_addr.sin_addr.s_addr = inet_addr ("172.23.71.255"); // address of the other endpoint
   broadcast_addr.sin_port = htons(PORT);
 
   while (1)
   {
-    printf ("sending packets");
     ret = sendto(sock, IP_FOUND, strlen(IP_FOUND), 0, (struct sockaddr *)&broadcast_addr, addr_len);
-    printf ("packets sent");
+    printf ("packets sent\n");
 
     FD_ZERO(&readfd);
     FD_SET(sock, &readfd);
