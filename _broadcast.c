@@ -25,7 +25,7 @@ int main () {
 
     pkt.id = 1;
     strcpy (pkt.mac, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    pkt.ip = inet_addr ("128.208.4.14");
+    pkt.ip = inet_addr ("172.23.64.243");
     pkt.port = htonl ((long)2190);
 
     int sockfd; // socket file descriptor
@@ -42,7 +42,7 @@ int main () {
     }
 
     // this allows sending packets to the broadcast address
-    if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof broadcast) == -1) {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, (char *)&broadcast, sizeof broadcast) == -1) {
         printf ("Enabling socket to broadcast failed!!");
         exit(1);
     }
@@ -51,11 +51,12 @@ int main () {
     their_addr.sin_family = AF_INET;
     their_addr.sin_port = htons(BROADCAST_PORT);
     their_addr.sin_addr.s_addr = broadcast_addr;
+    // their_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
     memset(their_addr.sin_zero, '\0', sizeof their_addr.sin_zero);
 
     // send the broadcast packet
     while (1) {
-        if ((numbytes=sento(sockfd, pkt, sizeof(Packet), 0, (struct sockaddr *)&their_addr,
+        if ((numbytes=sendto(sockfd, "FOUND", strlen("FOUND"), 0, (struct sockaddr *)&their_addr,
                                                                 sizeof their_addr)) == -1) {
             printf ("Failed to send packet");
             exit (1);

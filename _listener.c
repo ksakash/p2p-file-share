@@ -32,7 +32,10 @@ int main () {
     my_addr.sin_family = AF_INET; // host byte order
     my_addr.sin_port = htons(BROADCAST_PORT);
     my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fillup with my IP
+    // my_addr.sin_addr.s_addr = inet_addr ("172.23.64.243");
     memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
+
+    printf ("My address: %s\n", inet_ntoa(my_addr.sin_addr));
 
     // bind the socket to the port
     if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr) == -1) {
