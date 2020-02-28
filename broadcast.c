@@ -10,6 +10,15 @@
 #define PORT 9999
 #define BEACON_INTERVAL 5
 
+struct Packet {
+	int id;
+	char mac[12];
+	int ip;
+	int port;
+};
+
+typedef struct Packet Packet;
+
 int main()
 {
   printf ("client init\n");
@@ -23,6 +32,13 @@ int main()
   fd_set readfd;
   char buffer[1024];
   int i;
+
+  Packet p;
+
+	p.id = 1;
+	strcpy(p.mac, "ABCDEFGHIJKL");
+	p.ip = inet_addr("192.168.100.102");
+	p.port = htonl((long)9999);
 
   sock = socket(AF_INET, SOCK_DGRAM, 0);
   if (sock < 0)
@@ -42,12 +58,17 @@ int main()
   memset((void *)&broadcast_addr, 0, addr_len);
   broadcast_addr.sin_family = AF_INET;
   broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-  broadcast_addr.sin_addr.s_addr = inet_addr ("172.23.71.255"); // address of the other endpoint
+  broadcast_addr.sin_addr.s_addr = inet_addr ("192.168.100.255"); // address of the other endpoint
   broadcast_addr.sin_port = htons(PORT);
 
   while (1)
   {
-    ret = sendto(sock, IP_FOUND, strlen(IP_FOUND), 0, (struct sockaddr *)&broadcast_addr, addr_len);
+    // ret = sendto(sock, IP_FOUND, strlen(IP_FOUND), 0, (struct sockaddr *)&broadcast_addr, addr_len);
+    if ((ret=sendto(sock, &p, sizeof(Packet), 0,
+						(struct sockaddr *)&broadcast_addr, addr_len)) == -1) {
+			perror("sendto");
+			exit(1);
+		}
     printf ("packets sent\n");
 
     FD_ZERO(&readfd);
